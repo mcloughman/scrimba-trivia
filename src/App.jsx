@@ -19,7 +19,7 @@ const App = () => {
         console.log(data.results)
         // Process the fetched data to create an array of questions with shuffled answers
         const processedQuestions = data.results.map((questionObject) => {
-          const question = questionObject.question
+          const decodedQuestion = he.decode(questionObject.question)
           const decodedCorrectAnswer = he.decode(questionObject.correct_answer)
           const decodedWrongAnswers = questionObject.incorrect_answers.map(
             (answer) => he.decode(answer)
@@ -28,7 +28,7 @@ const App = () => {
           const allAnswers = [...decodedWrongAnswers, decodedCorrectAnswer]
           const shuffledAnswers = allAnswers.sort(() => Math.random() - 0.5)
           return {
-            question,
+            question: decodedQuestion,
             shuffledAnswers,
             correctAnswer: decodedCorrectAnswer,
             id: "",
