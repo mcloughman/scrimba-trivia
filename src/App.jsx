@@ -8,8 +8,14 @@ import "./App.css"
 
 const App = () => {
   const [questions, setQuestions] = useState([])
-  const [shuffledAnswers, setShuffledAnswers] = useState([])
+
   const [quizState, setQuizState] = useState("notStarted")
+  // this will facilitate us to allow user to choose different quiz options
+  const [quizOptions, setQuizOptions] = useState({
+    category: "9", // Default to General Knowledge
+    difficulty: "easy", // Default to Easy
+    numQuestions: "5", // Default to 5
+  })
   // all my George Costanza instincts tell me to create a selectedAnswer state in the Question Component. But what about Bob Ziroll and those boxes.
   const [selectedAnswers, setSelectedAnswers] = useState({})
   const [score, setScore] = useState("")
@@ -19,16 +25,17 @@ const App = () => {
 
   useEffect(() => {
     if (quizState === "inProgress") {
+      setSelectedAnswers({})
       const fetchQuestions = async () => {
         setIsLoading(true)
         try {
-          const response = await fetch("https://opentdb.com/api.php?amount=5")
-
+          const apiUrl = `https://opentdb.com/api.php?amount=${quizOptions.numQuestions}&difficulty=${quizOptions.difficulty}&category=${quizOptions.category}`
+          const response = await fetch(apiUrl)
           if (!response.ok) {
             throw new Error("Failed to fetch")
           }
           const data = await response.json()
-          console.log(data.results)
+
           // Process the fetched data to create an array of questions with shuffled answers
           const processedQuestions = data.results.map((questionObject) => {
             const decodedQuestion = he.decode(questionObject.question)
@@ -57,25 +64,29 @@ const App = () => {
       }
       fetchQuestions()
     }
-  }, [quizState])
+  }, [quizState, quizOptions])
+
+  const handleQuizOptionChange = (optionName, value) => {
+    setQuizOptions((prevOptions) => ({
+      ...prevOptions,
+      [optionName]: value,
+    }))
+  }
+
+  const startQuiz = () => {
+    setQuizState("inProgress")
+  }
 
   const handleSelectedAnswers = (prop, val) => {
-    console.log(prop, val)
     setSelectedAnswers((prevSelectedAnswers) => ({
       ...prevSelectedAnswers,
       [prop]: val,
     }))
   }
 
-  const startQuiz = () => {
-    setQuizState("inProgress")
-    console.log("Quiz Started")
-  }
-
   const gradeQuiz = () => {
     let rightAnswers = 0
     questions.forEach((question, index) => {
-      console.log(question.correctAnswer, selectedAnswers[index])
       question.correctAnswer === selectedAnswers[index]
         ? (rightAnswers += 1)
         : 0
@@ -102,13 +113,36 @@ const App = () => {
 
   return (
     <>
-      {quizState === "notStarted" && <Home startQuiz={startQuiz} />}
+      {quizState === "notStarted" && (
+        <Home
+          startQuiz={startQuiz}
+          quizOptions={quizOptions}
+          onQuizOptionsChange={handleQuizOptionChange}
+        />
+      )}
       {isLoading && quizState !== "notStarted" && <h2>Loading...</h2>}
       <div ref={scoreRef}>
         {quizState === "graded" && (
-          <h2 className="score">
-            Your score: <span className="score-span">{score}</span>
-          </h2>
+          <div className="graded-div">
+            <h2 className="score">
+              Your score: <span className="score-span">{score}</span>
+            </h2>
+            <div className="next-action-div">
+              <button
+                onClick={startQuiz}
+                className="next-action-btn"
+                id="start-quiz-btn"
+              >
+                Start New Quiz
+              </button>
+              <button
+                onClick={() => setQuizState("notStarted")}
+                className="next-action-btn"
+              >
+                Change Quiz
+              </button>
+            </div>
+          </div>
         )}
       </div>
 
