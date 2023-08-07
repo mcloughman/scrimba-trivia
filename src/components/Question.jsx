@@ -4,6 +4,7 @@ import { nanoid } from "nanoid"
 
 const Question = (props) => {
   const { question, shuffledAnswers, correctAnswer, id } = props.questionObject
+  const { selectedAnswer, handleSelectedAnswers } = props
   // Sort the shuffledAnswers array to ensure boolean radio buttons render "True" followed by "False"
   const sortedAnswers = [...shuffledAnswers].sort((a, b) => {
     if (a === "True" && b === "False") {
@@ -14,17 +15,24 @@ const Question = (props) => {
       return 0
     }
   })
-  console.log(correctAnswer)
+
   return (
     <div className="question-div">
       <h2>
-        Question {id + 1}. {question}
+        {id + 1}. {question}
       </h2>
       {sortedAnswers.map((answer) => {
         const answerId = nanoid()
         return (
           <div className="answer-div" key={nanoid()}>
-            <input type="radio" id={answerId} name={`question-${id + 1}`} />
+            <input
+              type="radio"
+              id={answerId}
+              name={`question-${id + 1}`}
+              value={answer}
+              checked={selectedAnswer === answer}
+              onChange={handleSelectedAnswers}
+            />
             <label htmlFor={answerId}>{answer}</label>
           </div>
         )

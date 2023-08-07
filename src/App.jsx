@@ -7,6 +7,8 @@ import Question from "./components/Question"
 const App = () => {
   const [questions, setQuestions] = useState([])
   const [shuffledAnswers, setShuffledAnswers] = useState([])
+  // all my George Costanza instincts tell me to create a selectedAnswer state in the Question Component. But what about Bob Ziroll and those boxes.
+  const [selectedAnswers, setSelectedAnswers] = useState({})
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -43,15 +45,33 @@ const App = () => {
     fetchQuestions()
   }, [])
 
+  const handleSelectedAnswers = (prop, val) => {
+    console.log(prop, val)
+    setSelectedAnswers((prevSelectedAnswers) => ({
+      ...prevSelectedAnswers,
+      [prop]: val,
+    }))
+  }
+
   const quizQuestions = questions.map((questionObject, index) => {
     questionObject.id = index
-    return <Question key={index} questionObject={questionObject} />
+    return (
+      <Question
+        key={index}
+        questionObject={questionObject}
+        selectedAnswer={selectedAnswers[index] || ""}
+        handleSelectedAnswers={(e) =>
+          handleSelectedAnswers(questionObject.id, e.target.value)
+        }
+      />
+    )
   })
 
   return (
     <>
       <Home />
       {quizQuestions}
+      <button onClick={gradeQuiz}>Submit Answers</button>
     </>
   )
 }
