@@ -23,6 +23,9 @@ const Home = (props) => {
             <option value="21">Sports</option>
             <option value="22">Geography</option>
             <option value="23">History</option>
+            <option value="10">Books</option>
+            <option value="11">Movies</option>
+            <option value="14">TV</option>
           </select>
         </div>
         <div className="level dropdown">
