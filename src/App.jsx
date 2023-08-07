@@ -7,6 +7,7 @@ import Question from "./components/Question"
 const App = () => {
   const [questions, setQuestions] = useState([])
   const [shuffledAnswers, setShuffledAnswers] = useState([])
+  const [quizState, setQuizState] = useState("notStarted")
   // all my George Costanza instincts tell me to create a selectedAnswer state in the Question Component. But what about Bob Ziroll and those boxes.
   const [selectedAnswers, setSelectedAnswers] = useState({})
   useEffect(() => {
@@ -67,11 +68,24 @@ const App = () => {
     )
   })
 
+  const gradeQuiz = () => {
+    let rightAnswers = 0
+    questions.forEach((question, index) => {
+      console.log(question.correctAnswer, selectedAnswers[index])
+      question.correctAnswer === selectedAnswers[index]
+        ? (rightAnswers += 1)
+        : 0
+    })
+    return rightAnswers / questions.length
+  }
+
   return (
     <>
-      <Home />
-      {quizQuestions}
-      <button onClick={gradeQuiz}>Submit Answers</button>
+      {quizState === "notStarted" && <Home />}
+      {quizState !== "notStarted" && quizQuestions}
+      {quizState === "inProgress" && (
+        <button onClick={gradeQuiz}>Submit Answers</button>
+      )}
     </>
   )
 }
