@@ -57,7 +57,7 @@ input[type="radio"] {
 }
 
 /* Style for the custom radio button */
-label.radio-button {
+label.radio-btn {
   display: inline-block;
   padding: 10px 20px;
   background-color: whitesmoke;
@@ -72,7 +72,7 @@ label.radio-button {
 }
 
 /* Style for the custom radio button when selected */
-input[type="radio"]:checked + label.radio-button {
+input[type="radio"]:checked + label.radio-btn {
   background-color: #007bff;
   position: relative;
   z-index: 0;

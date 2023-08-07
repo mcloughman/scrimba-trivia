@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import he from "he"
 import { nanoid } from "nanoid"
 
@@ -12,9 +12,15 @@ const App = () => {
   const [quizState, setQuizState] = useState("notStarted")
   // all my George Costanza instincts tell me to create a selectedAnswer state in the Question Component. But what about Bob Ziroll and those boxes.
   const [selectedAnswers, setSelectedAnswers] = useState({})
+  const [score, setScore] = useState("")
+  const [isLoading, setIsLoading] = useState("false")
+  // We need this in our gradeQuiz func so user won't have to scroll to see their score
+  const scoreRef = useRef(null)
+
   useEffect(() => {
     if (quizState === "inProgress") {
       const fetchQuestions = async () => {
+        setIsLoading(true)
         try {
           const response = await fetch("https://opentdb.com/api.php?amount=5")
 
@@ -47,6 +53,7 @@ const App = () => {
           console.log("Error", e.message)
           return
         }
+        setIsLoading(false)
       }
       fetchQuestions()
     }
@@ -73,7 +80,9 @@ const App = () => {
         ? (rightAnswers += 1)
         : 0
     })
-    return rightAnswers / questions.length
+    setQuizState("graded")
+    setScore(`${rightAnswers}/${questions.length}`)
+    scoreRef.current.scrollIntoView({ behavior: "smooth" })
   }
 
   const quizQuestions = questions.map((questionObject, index) => {
@@ -86,6 +95,7 @@ const App = () => {
         handleSelectedAnswers={(e) =>
           handleSelectedAnswers(questionObject.id, e.target.value)
         }
+        quizGraded={quizState === "graded"}
       />
     )
   })
@@ -93,9 +103,20 @@ const App = () => {
   return (
     <>
       {quizState === "notStarted" && <Home startQuiz={startQuiz} />}
-      {quizState !== "notStarted" && quizQuestions}
-      {quizState === "inProgress" && (
-        <button onClick={gradeQuiz}>Submit Answers</button>
+      {isLoading && quizState !== "notStarted" && <h2>Loading...</h2>}
+      <div ref={scoreRef}>
+        {quizState === "graded" && (
+          <h2 className="score">
+            Your score: <span className="score-span">{score}</span>
+          </h2>
+        )}
+      </div>
+
+      {quizState !== "notStarted" && !isLoading && quizQuestions}
+      {quizState === "inProgress" && !isLoading && (
+        <button onClick={gradeQuiz} className="submit-btn">
+          Submit Answers
+        </button>
       )}
     </>
   )
