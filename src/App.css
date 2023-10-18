@@ -17,7 +17,8 @@ body {
 .dropdown select {
   height: 40px;
   margin-top: 20px;
-  font-size: 1rem;
+  /* just changed for srimba- tutorial on issue and branches in github */
+  font-size: 1.25rem;
   font-family: Inter, sans-serif;
   border-radius: 10px;
   text-align: center;
